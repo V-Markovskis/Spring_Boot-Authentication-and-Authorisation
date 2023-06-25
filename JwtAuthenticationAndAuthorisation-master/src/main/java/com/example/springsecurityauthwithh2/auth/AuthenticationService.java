@@ -35,7 +35,7 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         String email = request.getEmail();
 
-        //Проверка наличия пользователя с таким же адресом электронной почты
+        //Check if user exist with this email
         Optional<User> existingUser = repository.findByEmail(email);
         if(existingUser.isPresent()) {
             throw new EmailAlreadyExistsException("User with this email already registered");
