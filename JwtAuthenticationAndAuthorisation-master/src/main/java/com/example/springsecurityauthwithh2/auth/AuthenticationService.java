@@ -1,7 +1,8 @@
 package com.example.springsecurityauthwithh2.auth;
 
 
-import com.example.springsecurityauthwithh2.config.EmailAlreadyExistsException;
+import com.example.springsecurityauthwithh2.exceptions.EmailAlreadyExistsException;
+import com.example.springsecurityauthwithh2.exceptions.InvalidEmailFormatException;
 import com.example.springsecurityauthwithh2.config.JwtService;
 import com.example.springsecurityauthwithh2.repository.UserRepository;
 import com.example.springsecurityauthwithh2.user.Role;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 //class to implement methods: register and authenticate
 @Service
@@ -41,9 +44,19 @@ public class AuthenticationService {
             throw new EmailAlreadyExistsException("User with this email already registered");
         }
 
+        //Validate email format
+        if (!isValidEmail(email)) {
+            throw new InvalidEmailFormatException("Invalid email format");
+        }
+
+        //Validate password length
+        if (request.getPassword().length() < 6) {
+            throw new IllegalArgumentException("Password must be at least 6 characters long");
+        }
+
         //create user object out of this RegisterRequest
         var user = User.builder()
-                //to build this user out of this register request:
+                //to build this user out of this register request
                 .firstName(request.getFirstname())
                 .lastName(request.getLastname())
                 .email(request.getEmail())
@@ -58,6 +71,14 @@ public class AuthenticationService {
                 //pass the token that was generated
                 .token(jwtToken)
                 .build();
+    }
+
+    private boolean isValidEmail(String email) {
+        //Regular expression for email validation
+        String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        Matcher matcher  = pattern.matcher(email);
+        return matcher.matches();
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
