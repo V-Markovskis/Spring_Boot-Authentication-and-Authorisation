@@ -1,6 +1,5 @@
 package com.example.springsecurityauthwithh2.config;
 
-import jakarta.servlet.Filter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,12 +9,17 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
+
+import static org.springframework.security.web.util.matcher.AntPathRequestMatcher.antMatcher;
 
 //@Configuration and @EnableWebSecurity need to be together when we work with springboot 3.0
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfiguration {
+
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final AuthenticationProvider authenticationProvider;
 
@@ -30,14 +34,19 @@ public class SecurityConfiguration {
                 //implement the real configuration
                 //within the security app we can add whitelist
                 //whitelist means that we have some endpoints that do not require any authentication or any tokens
-                .authorizeHttpRequests()
-                //authorize all request within below list
-                .requestMatchers("/api/v1/auth/**")
-                .permitAll()
-                //any other requests should be authenticated
-                .anyRequest()
-                .authenticated()
-                .and()
+                .authorizeHttpRequests((authorize) -> authorize
+                        .requestMatchers(antMatcher("/api/v1/auth/**")).permitAll()
+                        .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+                        .anyRequest().authenticated()
+                )
+//                .authorizeHttpRequests()
+//                //authorize all request within below list
+//                .requestMatchers("/api/v1/auth/**", "/h2-console/**")
+//                .permitAll()
+//                //any other requests should be authenticated
+//                .anyRequest()
+//                .authenticated()
+//                .and()
                 //configure session management
                 .sessionManagement()
                 //how we want to create our session
@@ -50,6 +59,8 @@ public class SecurityConfiguration {
                 //use .addFilterBefore cuz I want to execute this filter before
                 //the filter called username password authentication
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        //Allow frames in the H2 console => allows to access console page after login
+        http.headers().frameOptions().sameOrigin();
         //http.build() may throw and Exception => add
         return http.build();
 

@@ -33,6 +33,7 @@ public class User implements UserDetails {
     private String email;
     private String password;
 
+
     //@Enumerated tell to spring boot that this is enum
     @Enumerated(EnumType.STRING)
     private Role role;
