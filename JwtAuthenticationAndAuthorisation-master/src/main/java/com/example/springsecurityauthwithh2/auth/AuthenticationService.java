@@ -5,6 +5,7 @@ import com.example.springsecurityauthwithh2.exceptions.EmailAlreadyExistsExcepti
 import com.example.springsecurityauthwithh2.exceptions.InvalidEmailFormatException;
 import com.example.springsecurityauthwithh2.config.JwtService;
 import com.example.springsecurityauthwithh2.repository.UserRepository;
+import com.example.springsecurityauthwithh2.user.Role;
 import com.example.springsecurityauthwithh2.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -61,7 +62,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 //roles assigned dynamically
-                .role(request.getRole())
+                .role(request.getRole() == null ? Role.USER : request.getRole())
                 .build();
         repository.save(user);
         //to return AuthenticationResponse that contains the token create new variable:
