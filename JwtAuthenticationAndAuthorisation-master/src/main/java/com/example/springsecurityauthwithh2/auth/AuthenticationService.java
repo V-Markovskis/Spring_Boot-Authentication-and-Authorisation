@@ -1,10 +1,12 @@
 package com.example.springsecurityauthwithh2.auth;
 
 
+import com.example.springsecurityauthwithh2.auth.validators.AuthenticationRequestValidator;
 import com.example.springsecurityauthwithh2.exceptions.EmailAlreadyExistsException;
 import com.example.springsecurityauthwithh2.exceptions.InvalidEmailFormatException;
 import com.example.springsecurityauthwithh2.config.JwtService;
 import com.example.springsecurityauthwithh2.repository.UserRepository;
+import com.example.springsecurityauthwithh2.user.Role;
 import com.example.springsecurityauthwithh2.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,6 +14,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -20,7 +23,6 @@ import java.util.regex.Pattern;
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
-
     //inject our repository
     private final UserRepository repository;
 
@@ -32,26 +34,16 @@ public class AuthenticationService {
 
     private final AuthenticationManager authenticationManager;
 
+    private final List<AuthenticationRequestValidator> authenticationRequestValidators;
+
     //method returns the authenticationResponse
     //method allows us to create a user => save it to the DB => return generated token out of it
     public AuthenticationResponse register(RegisterRequest request) {
         String email = request.getEmail();
 
         //Check if user exist with this email
-        Optional<User> existingUser = repository.findByEmail(email);
-        if(existingUser.isPresent()) {
-            throw new EmailAlreadyExistsException("User with this email already registered");
-        }
-
-        //Validate email format
-        if (!isValidEmail(email)) {
-            throw new InvalidEmailFormatException("Invalid email format");
-        }
-
+        authenticationRequestValidators.forEach(validator -> validator.validate(request));
         //Validate password length
-        if (request.getPassword().length() < 6) {
-            throw new IllegalArgumentException("Password must be at least 6 characters long");
-        }
 
         //create user object out of this RegisterRequest
         var user = User.builder()
@@ -61,7 +53,7 @@ public class AuthenticationService {
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
                 //roles assigned dynamically
-                .role(request.getRole())
+                .role(request.getRole() == null ? Role.USER : request.getRole())
                 .build();
         repository.save(user);
         //to return AuthenticationResponse that contains the token create new variable:
@@ -77,7 +69,7 @@ public class AuthenticationService {
         //Regular expression for email validation
         String emailRegex = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$";
         Pattern pattern = Pattern.compile(emailRegex);
-        Matcher matcher  = pattern.matcher(email);
+        Matcher matcher = pattern.matcher(email);
         return matcher.matches();
     }
 

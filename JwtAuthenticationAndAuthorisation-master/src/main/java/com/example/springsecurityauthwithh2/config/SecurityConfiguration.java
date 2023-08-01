@@ -1,6 +1,7 @@
 package com.example.springsecurityauthwithh2.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -21,7 +22,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableMethodSecurity
+//@EnableMethodSecurity
 public class SecurityConfiguration {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -39,10 +40,12 @@ public class SecurityConfiguration {
                 //within the security app we can add whitelist
                 //whitelist means that we have some endpoints that do not require any authentication or any tokens
                 .authorizeHttpRequests((authorize) -> authorize
-                        .requestMatchers(antMatcher("/api/v1/auth/**")).permitAll()
-                        .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+                                .requestMatchers(antMatcher("/api/v1/auth/register")).permitAll()
+                                .requestMatchers(antMatcher("/api/v1/auth/authenticate")).permitAll()
+                                .requestMatchers(antMatcher("/api/v1/admin/roles/add/**")).hasAuthority(ADMIN_UPDATE.getPermission())
+                                .requestMatchers(PathRequest.toH2Console()).permitAll()
 
-                        //secured endpoint which is accessible only by ADMIN and MANAGER
+                                //secured endpoint which is accessible only by ADMIN and MANAGER
 //                        .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())
 //
 //                        //securing different operations
