@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminController {
 
-    private UserService userService;
+    private UserService  userService;
 
     @Autowired
     public AdminController(UserService userService) {
