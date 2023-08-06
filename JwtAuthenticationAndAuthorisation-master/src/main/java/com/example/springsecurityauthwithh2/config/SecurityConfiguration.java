@@ -21,6 +21,7 @@ import static org.springframework.security.web.util.matcher.AntPathRequestMatche
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
+//tell spring that @PreAuthorize will be used
 @EnableMethodSecurity
 public class SecurityConfiguration {
 
@@ -41,6 +42,11 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers(antMatcher("/api/v1/auth/**")).permitAll()
                         .requestMatchers(antMatcher("/h2-console/**")).permitAll()
+                        .requestMatchers(antMatcher("/swagger-ui/**")).permitAll()
+                        //Swagger UI will request an OpenAPI JSON document using the path http://localhost:8080/v3/api-docs
+                        //and then display documentation based on that document
+                        .requestMatchers(antMatcher("/v3/api-docs/**")).permitAll()
+                        .requestMatchers(antMatcher("api/v1/admin/roles/add/**")).hasAuthority(ADMIN_UPDATE.getPermission())
 
                         //secured endpoint which is accessible only by ADMIN and MANAGER
 //                        .requestMatchers("/api/v1/management/**").hasAnyRole(ADMIN.name(), MANAGER.name())

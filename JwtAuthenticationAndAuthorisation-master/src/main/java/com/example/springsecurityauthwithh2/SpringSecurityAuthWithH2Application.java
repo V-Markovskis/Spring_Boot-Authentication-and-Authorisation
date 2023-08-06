@@ -17,8 +17,10 @@ public class SpringSecurityAuthWithH2Application {
 		SpringApplication.run(SpringSecurityAuthWithH2Application.class, args);
 	}
 
+	//CommandLineRunner - interface in Spring Boot designed to execute code at app startup - contains run method
 	@Bean
 	public CommandLineRunner commandLineRunner(
+			//passing AuthenticationService instance as an argument allows to use this service inside a method
 			AuthenticationService service
 	) {
 		return args -> {
