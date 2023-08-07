@@ -1,4 +1,4 @@
-package com.example.springsecurityauthwithh2.auth.validators;
+package com.example.springsecurityauthwithh2.validators;
 
 import com.example.springsecurityauthwithh2.auth.RegisterRequest;
 import com.example.springsecurityauthwithh2.exceptions.EmailAlreadyExistsException;
@@ -11,17 +11,18 @@ import java.util.Optional;
 
 @Component
 public class ExistingUserValidator implements AuthenticationRequestValidator {
+
     private final UserRepository repository;
 
     @Autowired
-    ExistingUserValidator(UserRepository repository) {
+    public ExistingUserValidator(UserRepository repository) {
         this.repository = repository;
     }
 
     @Override
     public void validate(RegisterRequest request) {
         Optional<User> existingUser = repository.findByEmail(request.getEmail());
-        if (existingUser.isPresent()) {
+        if(existingUser.isPresent()) {
             throw new EmailAlreadyExistsException("User with this email already registered");
         }
     }

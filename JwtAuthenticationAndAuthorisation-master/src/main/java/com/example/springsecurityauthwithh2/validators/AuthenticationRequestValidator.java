@@ -1,4 +1,4 @@
-package com.example.springsecurityauthwithh2.validation;
+package com.example.springsecurityauthwithh2.validators;
 
 import com.example.springsecurityauthwithh2.auth.RegisterRequest;
 

@@ -1,4 +1,4 @@
-package com.example.springsecurityauthwithh2.auth.validators;
+package com.example.springsecurityauthwithh2.validators;
 
 import com.example.springsecurityauthwithh2.auth.RegisterRequest;
 import org.springframework.stereotype.Component;
@@ -7,8 +7,10 @@ import org.springframework.stereotype.Component;
 public class PasswordValidator implements AuthenticationRequestValidator {
     @Override
     public void validate(RegisterRequest request) {
-        if (request.getPassword().length() < 6) {
+        if(request.getPassword().length() < 6) {
             throw new IllegalArgumentException("Password must be at least 6 characters long");
         }
     }
+
+
 }

@@ -1,7 +1,7 @@
 package com.example.springsecurityauthwithh2.auth;
 
 
-import com.example.springsecurityauthwithh2.validation.AuthenticationRequestValidator;
+import com.example.springsecurityauthwithh2.validators.AuthenticationRequestValidator;
 import com.example.springsecurityauthwithh2.config.JwtService;
 import com.example.springsecurityauthwithh2.repository.UserRepository;
 import com.example.springsecurityauthwithh2.user.Role;
