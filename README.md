@@ -54,4 +54,3 @@ password=
 
 Once connected, you can see all existing users. Use SQL query : ```SELECT * FROM USERS ``` and ```Run``` button.
 
-I invite you to explore and evaluate – hope you enjoy it! :eyes:
